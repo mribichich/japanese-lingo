@@ -1,8 +1,8 @@
+import { flatten, ifElse, map, pipe, sortBy } from 'ramda';
 import React, { useState } from 'react';
-import words, { Words, Word } from './words';
 import styled from 'styled-components';
-import { flatten } from 'ramda';
 import { shuffle } from './utils';
+import words, { Word, Words } from './words';
 
 const Container = styled.div`
   text-align: center;
@@ -30,8 +30,8 @@ const ControlsButton = styled.button`
 const App: React.FC = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
-  const [section, setSection] = useState('all');
-  const [wordsToUse, setWordsToUse] = useState(shuffle(flatten<Word>(Object.values(words))));
+  const [section, setSection] = useState<keyof Words | undefined>(undefined);
+  const [wordsToUse, setWordsToUse] = useState(shuffle(flatten(Object.values(words))));
 
   function prevWord() {
     setCurrentWordIndex(currentWordIndex !== 0 ? currentWordIndex - 1 : wordsToUse.length - 1);
@@ -47,27 +47,39 @@ const App: React.FC = () => {
     }, 1500);
   }
 
-  function handleOnSectionChange(section: string) {
+  function handleOnSectionChange(section: keyof Words | undefined) {
     return () => {
       setSection(section);
-      setWordsToUse(section === 'all' ? shuffle(flatten<Word>(Object.values(words))) : words[section]);
+      setWordsToUse(
+        pipe<keyof Words | undefined, Word[], Word[]>(
+          ifElse(
+            m => !m,
+            () => flatten(Object.values(words)),
+            (m: keyof Words) => words[m]
+          ),
+          shuffle
+        )(section)
+      );
+      setCurrentWordIndex(0);
     };
   }
 
   const wordToUse = wordsToUse[currentWordIndex];
+
+  const translations = sortBy(Boolean, [wordToUse.spanish, wordToUse.english]);
 
   return (
     <Container>
       <br />
       <br />
       <div>
-        <SectionButton current={section === 'all'} onClick={handleOnSectionChange('all')}>
+        <SectionButton current={!section} onClick={handleOnSectionChange(undefined)}>
           all
         </SectionButton>
         &nbsp;
         {Object.keys(words).map(m => (
           <span key={m}>
-            <SectionButton current={section === m} onClick={handleOnSectionChange(m)}>
+            <SectionButton current={section === m} onClick={handleOnSectionChange(m as keyof Words)}>
               {m}
             </SectionButton>
             &nbsp;
@@ -78,11 +90,16 @@ const App: React.FC = () => {
       <br />
       <WordContainer>{wordToUse.kanji}</WordContainer>
       <br />
-      <WordContainer>{wordToUse.furigana || wordToUse.romaji}</WordContainer>
-      <br />
-      <MeaningWord>{showTranslation && wordToUse.spanish}</MeaningWord>
-      <br />
-      <MeaningWord>{showTranslation && wordToUse.english}</MeaningWord>
+      <WordContainer>{wordToUse.furigana}</WordContainer>
+      {map(
+        m => (
+          <>
+            <br />
+            <MeaningWord>{showTranslation && m}</MeaningWord>
+          </>
+        ),
+        translations
+      )}
       <br />
       <br />
       <ControlsButton onClick={prevWord}>prev</ControlsButton>&nbsp;

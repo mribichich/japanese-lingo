@@ -1,21 +1,26 @@
-export type Word = {
-  module?: string;
-  spanish: string;
-  english?: string;
-  romaji?: string;
-  furigana: string;
-  kanji: string;
-};
-export type Words = {
-  [key: string]: Word[];
+export type SpanishWord = { spanish: string };
 
+export type EnglishWord = { english: string };
+
+export type Word = ((SpanishWord & Partial<EnglishWord>) | (EnglishWord & Partial<SpanishWord>)) & {
+  module?: string;
+  furigana: string;
+  kanji?: string;
+};
+
+export type Words = {
+  languages: Word[];
   vocabulary: Word[];
   verbs: Word[];
+  daysOfWeek: Word[];
+  adjetives: Word[];
+  colors: Word[];
 };
 
-export default {
+const words: Words = {
   languages: [
     { module: '1', spanish: 'ingles', furigana: 'えいご', kanji: '' },
+    { spanish: 'ingles', furigana: 'えいご', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
@@ -23,20 +28,15 @@ export default {
     // { module: '', spanish: '',  furigana: '', kanji: '' },
   ],
   vocabulary: [
-    { module: '1', spanish: 'lapicera', romaji: 'bôrupen', furigana: 'ボウルペン', kanji: '' },
-    { module: '1', spanish: 'lapiz de mina', romaji: 'shâbupen', furigana: '', kanji: '' },
-    { module: '1', spanish: 'lapiz', romaji: 'enpitsu', furigana: 'えんぴつ', kanji: '' },
-    { module: '1', spanish: 'saca puntas', romaji: 'enpitsukezuri', furigana: 'えんぴつけずり', kanji: '鉛筆削り' },
-    { module: '1', spanish: 'liquid paper', romaji: 'inkukeshi', furigana: '', kanji: '' },
-    { module: '1', spanish: '', romaji: 'keshigomu', furigana: '', kanji: '' },
-    { module: '1', spanish: 'cartuchera', romaji: 'fudebako', furigana: '', kanji: '' },
-    { module: '1', spanish: 'bolso, cartera', romaji: 'kaban', furigana: '', kanji: '' },
-    { module: '1', spanish: 'carpeta', romaji: 'baindâ', furigana: '', kanji: '' },
+    { module: '1', spanish: 'lapicera', furigana: 'ボウルペン', kanji: '' },
+    { module: '1', spanish: 'lapiz', furigana: 'えんぴつ', kanji: '' },
+    { module: '1', spanish: 'saca puntas', furigana: 'えんぴつけずり', kanji: '鉛筆削り' },
+    { module: '1', spanish: 'bolso, cartera', furigana: 'かばん', kanji: '' },
     { module: 'general', spanish: 'pelicula', furigana: 'えいが', kanji: '' },
     { module: 'general', spanish: 'todos los dias', furigana: 'まいにち', kanji: '' },
     { module: 'general', spanish: 'diario', furigana: 'しんぶん', kanji: '' },
     { module: '', spanish: 'beisbol', furigana: 'やきゅう', kanji: '' },
-    { module: '', spanish: 'agua', furigana: 'みず', kanji: '' },
+    { module: '', spanish: 'agua', furigana: 'みず', kanji: '水' },
     { module: '', spanish: 'yo', furigana: 'わたし', kanji: '私' },
     { module: '', spanish: 'yo femenino', furigana: 'あたし', kanji: '' },
     { module: '', spanish: 'el', english: 'him', furigana: 'かれ', kanji: '彼' },
@@ -46,13 +46,7 @@ export default {
     { module: '', spanish: 'mi familia', furigana: 'かぞく', kanji: '' },
     { module: '', spanish: 'nada/todo', english: 'nothing/everything', furigana: 'なにも', kanji: '' },
     { module: '', spanish: 'nadie/todos', english: 'nobory/everybody', furigana: 'だれも', kanji: '' },
-    {
-      module: '',
-      spanish: 'en nigun lado/en todos lados',
-      english: 'anywhere/everywhere',
-      furigana: 'どこも',
-      kanji: '',
-    },
+    { spanish: 'en nigun lado/en todos lados', english: 'anywhere/everywhere', furigana: 'どこも' },
     { module: '', spanish: 'nunca/siempre', english: 'never/always', furigana: 'いつも', kanji: '' },
     { module: '', spanish: 'este año', furigana: 'ことし', kanji: '' },
     { module: '', spanish: 'año que viene', furigana: 'らいねん', kanji: '' },
@@ -70,7 +64,7 @@ export default {
     { module: '', spanish: 'izquierda', furigana: 'ひだり', kanji: '' },
     { module: '', spanish: 'enfrente', furigana: 'まえ', kanji: '' },
     { module: '', spanish: 'detras', furigana: 'うしろ', kanji: '' },
-    { module: '', spanish: 'arriba', furigana: 'うえ', kanji: '' },
+    { module: '', spanish: 'arriba', furigana: 'うえ', kanji: '上' },
     { module: '', spanish: 'debajo', furigana: 'した', kanji: '下' },
     { module: '', spanish: 'adentro', furigana: 'なか', kanji: '中' },
     { module: '', spanish: 'afuera', furigana: 'そと', kanji: '' },
@@ -159,10 +153,58 @@ export default {
     { spanish: 'ocupado', furigana: 'いそがしい', kanji: '' },
     { spanish: 'bullilloso, lugar con vida', english: 'busy', furigana: 'にぎやか', kanji: '' },
     { spanish: 'bueno, bien', furigana: 'いい', kanji: '' },
+    { english: 'near', furigana: 'ちかい', kanji: '' },
+    { english: 'far', furigana: 'とおい', kanji: '' },
+    { english: 'heavy', furigana: 'おもい' },
+    { english: 'light', furigana: 'かるい' },
+    { english: 'bright, light', furigana: 'あかるい' },
+    { english: 'dark', furigana: 'くらい' },
+    { english: 'dangerous', furigana: 'あぶない' },
+    { english: 'wide, spacious', furigana: 'ひろい' },
+    { english: 'narrow', furigana: 'せまい' },
+    { english: 'hot, spicy', furigana: 'からい' },
+    { english: 'noisy', furigana: 'うるさい' },
+    { english: 'strong', furigana: 'つよい' },
+    { english: 'weak', furigana: 'よわい' },
+    { english: 'many, a lot', furigana: 'おおい' },
+    { english: 'few, a little', furigana: 'すくない' },
+    { english: 'thick (cylindrical object)', furigana: 'ふとい' },
+    { english: 'thin (cylindrical object)', furigana: 'ほそい' },
+    { english: 'thick (flat object)', furigana: 'あつい' },
+    { english: 'thin (flat object)', furigana: 'うすい' },
+    { english: 'lovely, cute', furigana: 'かわいい' },
+    { english: 'painful', furigana: 'いたい' },
+    { english: 'happy, glad', furigana: 'うれしい' },
+    { english: 'sad', furigana: 'かなしい' },
+    { english: 'young', furigana: 'わかい' },
+    { english: 'fast, early', furigana: 'はやい' },
+    { english: 'slow, late', furigana: 'おそい' },
+    // { module: '', spanish: '',  furigana: '', kanji: '' },
+    // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
     // { module: '', spanish: '',  furigana: '', kanji: '' },
   ],
-} as Words;
+  colors: [
+    { english: 'color', furigana: 'いろ', kanji: '色' },
+    { english: 'orange', furigana: 'オレンジ', kanji: '' },
+    { english: 'yellow', furigana: 'きいろ', kanji: '黄色' },
+    { english: 'blue', furigana: 'あお', kanji: '青' },
+    { english: 'red', furigana: 'あか', kanji: '赤' },
+    { english: 'green', furigana: 'みどり', kanji: '緑' },
+    { english: 'black', furigana: 'くろ', kanji: '黒' },
+    { english: 'brown', furigana: 'ちゃいろ', kanji: '茶色' },
+    { english: 'pink', furigana: 'ピンク', kanji: '' },
+    { english: 'purple', furigana: 'むらさき', kanji: '紫' },
+    { english: 'white', furigana: 'しろ', kanji: '白' },
+    { english: 'gray', furigana: 'はいいろ', kanji: '灰色' },
+    { english: 'gold', furigana: 'きんいろ', kanji: '金色' },
+    { english: 'silver', furigana: 'ぎんいろ', kanji: '銀色' },
+    // { spanish: '', furigana: '', kanji: '' },
+    // { spanish: '', furigana: '', kanji: '' },
+  ],
+};
+
+export default words;

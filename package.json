@@ -2,23 +2,27 @@
   "name": "japanese-lingo",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "@types/jest": "24.0.13",
-    "@types/node": "12.0.4",
-    "@types/react": "16.8.19",
-    "@types/react-dom": "16.8.4",
-    "ramda": "^0.26.1",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
-    "styled-components": "^4.2.1",
-    "typescript": "3.5.1"
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "@types/ramda": "^0.26.41",
+    "@types/styled-components": "^4.1.15"
+  },
+  "dependencies": {
+    "@types/jest": "24.0.13",
+    "@types/node": "12.0.4",
+    "@types/react": "16.8.19",
+    "@types/react-dom": "16.8.4",
+    "ramda": "^0.27.0",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "^3.3.1",
+    "styled-components": "^4.2.1",
+    "typescript": "^3.7.5"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -34,9 +38,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@types/ramda": "^0.26.9",
-    "@types/styled-components": "^4.1.15"
   }
 }
