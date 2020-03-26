@@ -1,16 +1,16 @@
-import { flatten, ifElse, map, pipe, sortBy } from 'ramda';
+import Button from '@material-ui/core/Button';
+import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
+import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
+import { all, filter, flatten, map, pipe, sortBy } from 'ramda';
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import Menu from './components/Menu';
+import { SectionsSelection } from './components/Menu/Menu';
 import { shuffle } from './utils';
 import words, { Word, Words } from './words';
 
 const Container = styled.div`
   text-align: center;
-`;
-
-const SectionButton = styled.button<{ current?: boolean }>`
-  font-size: 16px;
-  font-weight: ${props => (props.current ? 'bold' : 'normal')};
 `;
 
 const WordContainer = styled.div`
@@ -23,14 +23,13 @@ const MeaningWord = styled.div`
   height: 50px;
 `;
 
-const ControlsButton = styled.button`
-  font-size: 16px;
-`;
+const defaultSectionsSelection = () =>
+  Object.fromEntries(map(m => [m, false], Object.keys(words))) as SectionsSelection;
 
 const App: React.FC = () => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showTranslation, setShowTranslation] = useState(false);
-  const [section, setSection] = useState<keyof Words | undefined>(undefined);
+  const [selectedSections, setSelectedSections] = useState(defaultSectionsSelection());
   const [wordsToUse, setWordsToUse] = useState(shuffle(flatten(Object.values(words))));
 
   function prevWord() {
@@ -47,19 +46,30 @@ const App: React.FC = () => {
     }, 1500);
   }
 
-  function handleOnSectionChange(section: keyof Words | undefined) {
+  function handleClearSectionsSelectionsChange() {
+    setSelectedSections(defaultSectionsSelection());
+    setWordsToUse(shuffle(flatten(Object.values(words))));
+    setCurrentWordIndex(0);
+  }
+
+  function handleSectionSelectionChange(section: keyof Words) {
     return () => {
-      setSection(section);
-      setWordsToUse(
-        pipe<keyof Words | undefined, Word[], Word[]>(
-          ifElse(
-            m => !m,
-            () => flatten(Object.values(words)),
-            (m: keyof Words) => words[m]
-          ),
-          shuffle
-        )(section)
-      );
+      const newSelection = { ...selectedSections, [section]: !selectedSections[section] };
+      setSelectedSections(newSelection);
+
+      const noneSelected = all(a => !a, Object.values(newSelection));
+
+      const valuesToUse = noneSelected
+        ? Object.values(words)
+        : pipe(
+            filter(f => f[1]) as (list: readonly [keyof Words, boolean][]) => [keyof Words, boolean][],
+            map(m => m[0]),
+            map(m => words[m])
+          )(Object.entries(newSelection) as [keyof Words, boolean][]);
+
+      const newWordsToUse = pipe(flatten as (list: Word[][]) => Word[], shuffle)(valuesToUse);
+
+      setWordsToUse(newWordsToUse);
       setCurrentWordIndex(0);
     };
   }
@@ -72,20 +82,12 @@ const App: React.FC = () => {
     <Container>
       <br />
       <br />
-      <div>
-        <SectionButton current={!section} onClick={handleOnSectionChange(undefined)}>
-          all
-        </SectionButton>
-        &nbsp;
-        {Object.keys(words).map(m => (
-          <span key={m}>
-            <SectionButton current={section === m} onClick={handleOnSectionChange(m as keyof Words)}>
-              {m}
-            </SectionButton>
-            &nbsp;
-          </span>
-        ))}
-      </div>
+      <Menu
+        options={Object.keys(words) as (keyof Words)[]}
+        selected={selectedSections}
+        onClear={handleClearSectionsSelectionsChange}
+        onSelection={handleSectionSelectionChange}
+      />
       <br />
       <br />
       <WordContainer>{wordToUse.kanji}</WordContainer>
@@ -93,18 +95,26 @@ const App: React.FC = () => {
       <WordContainer>{wordToUse.furigana}</WordContainer>
       {map(
         m => (
-          <>
+          <div key={m}>
             <br />
             <MeaningWord>{showTranslation && m}</MeaningWord>
-          </>
+          </div>
         ),
         translations
       )}
       <br />
       <br />
-      <ControlsButton onClick={prevWord}>prev</ControlsButton>&nbsp;
-      <ControlsButton onClick={() => setShowTranslation(true)}>show</ControlsButton>&nbsp;
-      <ControlsButton onClick={nextWord}>next</ControlsButton>
+      <Button variant="outlined" startIcon={<ArrowBackIosIcon />} onClick={prevWord}>
+        prev
+      </Button>
+      &nbsp;
+      <Button variant="outlined" onClick={() => setShowTranslation(true)}>
+        show
+      </Button>
+      &nbsp;
+      <Button variant="outlined" endIcon={<ArrowForwardIosIcon />} onClick={nextWord}>
+        next
+      </Button>
     </Container>
   );
 };
