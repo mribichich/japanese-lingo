@@ -21,7 +21,7 @@ const Menu: FC<Props> = ({ options, selected, onClear, onSelection }) => {
       <Button startIcon={<ClearIcon />} onClick={onClear}>
         Clear
       </Button>
-      &nbsp;
+      &nbsp;&nbsp;
       {options.map(m => (
         <span key={m}>
           <FormControlLabel

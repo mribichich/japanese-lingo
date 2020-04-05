@@ -1,4 +1,8 @@
 import Button from '@material-ui/core/Button';
+import FormControl from '@material-ui/core/FormControl';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import Radio from '@material-ui/core/Radio';
+import RadioGroup from '@material-ui/core/RadioGroup';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
 import ArrowForwardIosIcon from '@material-ui/icons/ArrowForwardIos';
 import { all, filter, flatten, map, pipe, sortBy } from 'ramda';
@@ -23,6 +27,10 @@ const MeaningWord = styled.div`
   height: 50px;
 `;
 
+const showWord = (show: boolean) => (word: string | undefined) => {
+  return show && word;
+};
+
 const defaultSectionsSelection = () =>
   Object.fromEntries(map(m => [m, false], Object.keys(words))) as SectionsSelection;
 
@@ -31,6 +39,7 @@ const App: React.FC = () => {
   const [showTranslation, setShowTranslation] = useState(false);
   const [selectedSections, setSelectedSections] = useState(defaultSectionsSelection());
   const [wordsToUse, setWordsToUse] = useState(shuffle(flatten(Object.values(words))));
+  const [japaneseLanguage, setJapaneseLanguage] = useState(true);
 
   function prevWord() {
     setCurrentWordIndex(currentWordIndex !== 0 ? currentWordIndex - 1 : wordsToUse.length - 1);
@@ -40,10 +49,13 @@ const App: React.FC = () => {
   function nextWord() {
     setShowTranslation(true);
 
-    setTimeout(() => {
-      setCurrentWordIndex(currentWordIndex !== wordsToUse.length - 1 ? currentWordIndex + 1 : 0);
-      setShowTranslation(false);
-    }, 1500);
+    setTimeout(
+      () => {
+        setCurrentWordIndex(currentWordIndex !== wordsToUse.length - 1 ? currentWordIndex + 1 : 0);
+        setShowTranslation(false);
+      },
+      japaneseLanguage ? 1500 : 3000
+    );
   }
 
   function handleClearSectionsSelectionsChange() {
@@ -74,12 +86,26 @@ const App: React.FC = () => {
     };
   }
 
+  function handleLanguageChange(event: React.ChangeEvent<HTMLInputElement>, value: string) {
+    setJapaneseLanguage(value === 'true');
+  }
+
   const wordToUse = wordsToUse[currentWordIndex];
 
   const translations = sortBy(Boolean, [wordToUse.spanish, wordToUse.english]);
 
+  const showJapaneseWord = showWord(japaneseLanguage || showTranslation);
+  const showSpanishWord = showWord(!japaneseLanguage || showTranslation);
+
   return (
     <Container>
+      <br />
+      <FormControl component="fieldset">
+        <RadioGroup row aria-label="language" value={japaneseLanguage} onChange={handleLanguageChange}>
+          <FormControlLabel value={true} control={<Radio />} label="Japanese" />
+          <FormControlLabel value={false} control={<Radio />} label="Spanish" />
+        </RadioGroup>
+      </FormControl>
       <br />
       <br />
       <Menu
@@ -90,14 +116,14 @@ const App: React.FC = () => {
       />
       <br />
       <br />
-      <WordContainer>{wordToUse.kanji}</WordContainer>
+      <WordContainer>{showJapaneseWord(wordToUse.kanji)}</WordContainer>
       <br />
-      <WordContainer>{wordToUse.furigana}</WordContainer>
+      <WordContainer>{showJapaneseWord(wordToUse.furigana)}</WordContainer>
       {map(
         m => (
           <div key={m}>
             <br />
-            <MeaningWord>{showTranslation && m}</MeaningWord>
+            <MeaningWord>{showSpanishWord(m)}</MeaningWord>
           </div>
         ),
         translations

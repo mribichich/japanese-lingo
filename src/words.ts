@@ -215,7 +215,7 @@ const words: Words = {
     { module: 'general', spanish: '7 cosas general', furigana: 'ななつ', kanji: '七つ' },
     { module: 'general', spanish: '8 cosas general', furigana: 'やっつ', kanji: '八つ' },
     { module: 'general', spanish: '9 cosas general', furigana: 'ここのつ', kanji: '九つ' },
-    { module: 'general', spanish: '10 cosas general', furigana: 'とお', kanji: '十' },
+    { module: 'general', spanish: '10 cosas general', furigana: 'とお', kanji: '十つ' },
     { module: 'personas', spanish: '1 personas', furigana: 'ひとり', kanji: '一人' },
     { module: 'personas', spanish: '2 personas', furigana: 'ふたり', kanji: '二人' },
     { module: 'personas', spanish: '3 personas', furigana: 'さんにん', kanji: '三人' },
